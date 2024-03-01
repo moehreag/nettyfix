@@ -1,0 +1,98 @@
+plugins {
+	id 'maven-publish'
+	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'ploceus' version '1.5-SNAPSHOT'
+	id 'com.modrinth.minotaur' version "2.+"
+}
+
+base {
+	archivesName = project.archives_base_name
+}
+version = "${project.version}+${project.minecraft_version}"
+group = project.maven_group
+
+repositories {
+
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.layered {
+		mappings "net.ornithemc:feather:${project.minecraft_version}+build.${project.feather_build}:v2"
+		//addLayer ploceus.nestedMappings() // remove this line if not using nests
+	}
+	//nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}" // remove this line if not using nests
+
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	ploceus.addCommonLibraries()
+	ploceus.dependOsl(project.osl_version)
+
+	implementation include("io.netty:netty-all:4.1.9.Final")
+}
+
+processResources {
+	inputs.property 'version', version
+
+	filesMatching('fabric.mod.json') {
+		expand 'version': version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = 'UTF-8'
+	it.options.release = 8
+}
+
+java {
+	// Still required by IDEs such as Eclipse and Visual Studio Code
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+	withSourcesJar()
+}
+
+// If you plan to use a different file for the license, don't forget to change the file name here!
+jar {
+	from('LICENSE') {
+		rename { "${it}_${base.archivesName.get()}" }
+	}
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) { publication ->
+			from components.java
+			artifact remapJar
+		}
+	}
+
+	// select the repositories you want to publish to
+	repositories {
+		maven {
+			name = "owlMaven"
+			def repository = project.version.toString().contains("beta") || project.version.toString().contains("alpha") ? "snapshots" : "releases"
+			url = "https://moehreag.duckdns.org/maven/" + repository
+			credentials(PasswordCredentials)
+			authentication {
+				basic(BasicAuthentication)
+			}
+		}
+	}
+}
+
+tasks.modrinth.dependsOn publish
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = ""
+	versionType = "release"
+	uploadFile = remapJar
+	additionalFiles = [sourcesJar]
+	gameVersions = ["1.8.9"]
+	loaders = ["fabric", "quilt"]
+	dependencies {
+		optional.project "osl"
+	}
+}

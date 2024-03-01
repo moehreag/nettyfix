@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "nettyfix",
+	"version": "${version}",
+	"name": "NettyFix",
+	"description": "Fix netty when running with java 17!",
+	"authors": [
+		"moehreag"
+	],
+	"contact": {
+		"sources": "https://github.com/moehreag/nettyfix"
+	},
+	"license": "LGPL-3.0-or-later",
+	"icon": "assets/nettyfix/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"init": [
+      "io.github.moehreag.nettyfix.NettyFix"
+		]
+	},
+	"mixins": [
+    "nettyfix.mixins.json"
+	],
+  "depends": {
+		"fabricloader": "*",
+		"minecraft": "*",
+		"osl-entrypoints": ">=0.4.0"
+	}
+}
