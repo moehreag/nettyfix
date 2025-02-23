@@ -1,7 +1,7 @@
 plugins {
 	id 'maven-publish'
-	id 'fabric-loom' version '1.5-SNAPSHOT'
-	id 'ploceus' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'ploceus' version '1.10-SNAPSHOT'
 	id 'com.modrinth.minotaur' version "2.+"
 }
 
@@ -25,7 +25,6 @@ dependencies {
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	ploceus.addCommonLibraries()
 	ploceus.dependOsl(project.osl_version)
 
 	implementation include("io.netty:netty-all:4.1.9.Final")
@@ -64,7 +63,6 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) { publication ->
 			from components.java
-			artifact remapJar
 		}
 	}
 
