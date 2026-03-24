@@ -1,7 +1,7 @@
 plugins {
 	id 'maven-publish'
-	id 'fabric-loom' version '1.10-SNAPSHOT'
-	id 'ploceus' version '1.10-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version '1.15.+'
+	id 'ploceus' version '1.15.+'
 	id 'com.modrinth.minotaur' version "2.+"
 }
 
@@ -17,11 +17,7 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered {
-		mappings "net.ornithemc:feather:${project.minecraft_version}+build.${project.feather_build}:v2"
-		//addLayer ploceus.nestedMappings() // remove this line if not using nests
-	}
-	//nests "net.ornithemc:nests:${project.minecraft_version}+build.${project.nests_build}" // remove this line if not using nests
+	mappings ploceus.featherMappings(project.feather_build)
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
@@ -71,7 +67,7 @@ publishing {
 		maven {
 			name = "owlMaven"
 			def repository = project.version.toString().contains("beta") || project.version.toString().contains("alpha") ? "snapshots" : "releases"
-			url = "https://moehreag.duckdns.org/maven/" + repository
+			url = "https://maven.axolotlclient.com/" + repository
 			credentials(PasswordCredentials)
 			authentication {
 				basic(BasicAuthentication)
@@ -89,7 +85,7 @@ modrinth {
 	uploadFile = remapJar
 	additionalFiles = [sourcesJar]
 	gameVersions = ["1.8.9"]
-	loaders = ["fabric", "quilt"]
+	loaders = ["ornithe"]
 	dependencies {
 		optional.project "osl"
 	}
